@@ -4,8 +4,8 @@
 
 #### ✅ Grid System
 
-* [ ] Implement pointy-top **hexagonal grid** with axial coordinates.
-* [ ] Support tile selection / highlighting via mouse.
+* [x] Implement pointy-top **hexagonal grid** with axial coordinates.
+* [x] Support tile selection / highlighting via mouse.
 * [ ] Allow tile data storage (terrain, contents, building ID, etc.).
 
 #### ✅ Camera & Input
