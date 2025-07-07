@@ -11,6 +11,8 @@ A comprehensive hexagonal grid system for Unity with cube coordinates, radius se
 - **UI Integration**: Built-in UI controls for grid management
 - **Debug Visualization**: Coordinate display and grid line rendering
 - **Event System**: Comprehensive event handling for hex interactions
+- **Resource Generation**: Perlin noise-based resource generation for iron, copper, and grass
+- **Resource Management**: Resource extraction, amount tracking, and visual representation
 
 ## Files Overview
 
@@ -21,6 +23,8 @@ A comprehensive hexagonal grid system for Unity with cube coordinates, radius se
 3. **`HexUtils.cs`** - Static utility methods for cube coordinate operations
 4. **`HexGridUI.cs`** - UI controller for grid settings
 5. **`HexGridDemo.cs`** - Demo script showing system capabilities
+6. **`ResourceGenerator.cs`** - Perlin noise-based resource generation
+7. **`ResourceDemo.cs`** - Demo script for resource system testing
 
 ## Setup Instructions
 
@@ -65,6 +69,17 @@ In the `HexGridGenerator` component inspector:
 1. Add the `HexGridDemo` component to a GameObject
 2. Assign the `HexGridGenerator` and `Camera` references
 3. Configure the demo settings in the inspector
+
+### 5. Resource Generation Setup
+
+1. Add the `ResourceGenerator` component to a GameObject
+2. Configure the Perlin noise settings in the inspector:
+   - `Noise Scale`: Controls the size of resource clusters (default: 50)
+   - `Seed`: Random seed for reproducible generation
+   - `Iron Threshold`: Noise value above which iron appears (default: 0.6)
+   - `Copper Threshold`: Noise value above which copper appears (default: 0.7)
+3. Assign the `ResourceGenerator` reference to the `HexGridGenerator`
+4. Enable `Generate Resources` in the `HexGridGenerator` inspector
 
 ## Usage Examples
 
@@ -155,7 +170,46 @@ hex.OnHexUnhovered.AddListener((HexTile unhoveredHex) => {
 });
 ```
 
+### Resource Generation and Management
+
+```csharp
+// Get the resource generator
+ResourceGenerator resourceGen = FindObjectOfType<ResourceGenerator>();
+
+// Generate resources on the grid
+resourceGen.GenerateResources(hexGrid);
+
+// Regenerate resources with new parameters
+resourceGen.RegenerateResources(hexGrid);
+
+// Set noise parameters
+resourceGen.SetNoiseParameters(100f, 0.5f, 0.8f);
+
+// Work with individual hex resources
+HexTile hex = hexTile.GetComponent<HexTile>();
+
+// Check resource information
+Debug.Log($"Resource type: {hex.ResourceType}");
+Debug.Log($"Has resource: {hex.HasResource}");
+Debug.Log($"Resource amount: {hex.ResourceAmount}");
+
+// Set resource
+hex.SetResource(ResourceType.Iron, 5f);
+
+// Extract resource
+if (hex.CanExtractResource(2f))
+{
+    float extracted = hex.ExtractResource(2f);
+    Debug.Log($"Extracted {extracted} iron");
+}
+
+// Clear resource
+hex.ClearResource();
+```
+
 ## Demo Controls
+
+### HexGridDemo Controls
 
 When using the `HexGridDemo` component:
 
@@ -171,6 +225,17 @@ When using the `HexGridDemo` component:
   - `L`: Show line from selected hex to mouse position
   - `C`: Show cone from selected hex
   - `R`: Reset all visual effects
+
+### ResourceDemo Controls
+
+When using the `ResourceDemo` component:
+
+- **Mouse**:
+  - Left Click: Select a hexagon to view its resource information
+- **Keyboard**:
+  - `R`: Regenerate all resources with new Perlin noise
+  - `E`: Extract 1 unit of resource from selected tile
+  - `I`: Toggle resource information display
 
 ## Cube Coordinate System
 
@@ -238,7 +303,7 @@ public static class CustomHexOperations
     {
         List<Vector3Int> visible = new List<Vector3Int>();
         List<Vector3Int> area = HexUtils.GetArea(center, radius);
-      
+  
         foreach (Vector3Int coord in area)
         {
             if (HasLineOfSight(center, coord, obstacles))
@@ -246,14 +311,14 @@ public static class CustomHexOperations
                 visible.Add(coord);
             }
         }
-      
+  
         return visible;
     }
   
     private static bool HasLineOfSight(Vector3Int from, Vector3Int to, Vector3Int[] obstacles)
     {
         List<Vector3Int> line = HexUtils.GetLine(from, to);
-      
+  
         foreach (Vector3Int coord in line)
         {
             if (System.Array.IndexOf(obstacles, coord) != -1)
@@ -261,7 +326,7 @@ public static class CustomHexOperations
                 return false;
             }
         }
-      
+  
         return true;
     }
 }

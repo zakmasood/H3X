@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Events;
 using System.Collections.Generic;
 
 public class HexGridGenerator : MonoBehaviour
@@ -14,12 +15,19 @@ public class HexGridGenerator : MonoBehaviour
     [SerializeField] private Color borderColor = Color.black;
     [SerializeField] private float borderWidth = 0.05f;
     
+    [Header("Resource Generation")]
+    [SerializeField] private bool generateResources = true;
+    [SerializeField] private ResourceGenerator resourceGenerator;
+    
     [Header("Debug")]
     [SerializeField] private bool showCoordinates = true;
     [SerializeField] private bool showGridLines = true;
     
     private List<GameObject> hexTiles = new List<GameObject>();
     private Dictionary<Vector3Int, GameObject> hexMap = new Dictionary<Vector3Int, GameObject>();
+    
+    // Events
+    public UnityEvent OnGridGenerated;
     
     // Cube coordinate constants
     private static readonly Vector3Int[] CubeDirections = {
@@ -66,6 +74,15 @@ public class HexGridGenerator : MonoBehaviour
                 CreateHexTile(cubeCoord);
             }
         }
+        
+        // Generate resources after grid is created
+        if (generateResources && resourceGenerator != null)
+        {
+            resourceGenerator.GenerateResources(this);
+        }
+        
+        // Notify that grid generation is complete
+        OnGridGenerated?.Invoke();
     }
     
     private void CreateHexTile(Vector3Int cubeCoord)
@@ -108,6 +125,9 @@ public class HexGridGenerator : MonoBehaviour
         
         hexTiles.Add(hexTile);
         hexMap[cubeCoord] = hexTile;
+        
+        // Notify UI that new tiles are available
+        NotifyTilesCreated();
     }
     
     private Mesh CreateHexMesh()
@@ -221,10 +241,21 @@ public class HexGridGenerator : MonoBehaviour
         return hex;
     }
     
+    public List<GameObject> GetAllHexTiles()
+    {
+        return new List<GameObject>(hexTiles);
+    }
+    
     public void SetRadius(int newRadius)
     {
         radius = newRadius;
         GenerateHexGrid();
+    }
+    
+    private void NotifyTilesCreated()
+    {
+        // This method is called when new tiles are created
+        // The UI will handle the event subscription
     }
     
     private void OnDrawGizmos()

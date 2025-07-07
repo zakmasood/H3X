@@ -2,11 +2,24 @@ using UnityEngine;
 using UnityEngine.Events;
 using System.Collections.Generic;
 
+public enum ResourceType
+{
+    Grass,
+    Iron,
+    Copper,
+    Coal
+}
+
 public class HexTile : MonoBehaviour
 {
     [Header("Hex Data")]
     [SerializeField] private Vector3Int cubeCoordinates;
     [SerializeField] private Vector3 worldPosition;
+    
+    [Header("Resource Data")]
+    [SerializeField] private ResourceType resourceType = ResourceType.Grass;
+    [SerializeField] private float resourceAmount = 0f;
+    [SerializeField] private bool hasResource = false;
     
     [Header("Visual State")]
     [SerializeField] private bool isSelected = false;
@@ -14,6 +27,13 @@ public class HexTile : MonoBehaviour
     [SerializeField] private Color defaultColor = Color.white;
     [SerializeField] private Color selectedColor = Color.yellow;
     [SerializeField] private Color highlightedColor = Color.cyan;
+    
+    // Resource colors
+    [Header("Resource Colors")]
+    [SerializeField] private Color grassColor = new Color(0.2f, 0.8f, 0.2f); // Green
+    [SerializeField] private Color ironColor = new Color(0.6f, 0.6f, 0.6f); // Gray
+    [SerializeField] private Color copperColor = new Color(0.8f, 0.4f, 0.2f); // Orange
+    [SerializeField] private Color coalColor = new Color(0.1f, 0.1f, 0.1f); // Black
     
     [Header("Events")]
     public UnityEvent<HexTile> OnHexClicked;
@@ -27,6 +47,9 @@ public class HexTile : MonoBehaviour
     public Vector3 WorldPosition => worldPosition;
     public bool IsSelected => isSelected;
     public bool IsHighlighted => isHighlighted;
+    public ResourceType ResourceType => resourceType;
+    public float ResourceAmount => resourceAmount;
+    public bool HasResource => hasResource;
     
     private void Awake()
     {
@@ -98,6 +121,58 @@ public class HexTile : MonoBehaviour
         {
             UpdateVisual();
         }
+    }
+    
+    public void SetResource(ResourceType type, float amount = 1f)
+    {
+        resourceType = type;
+        resourceAmount = amount;
+        hasResource = type != ResourceType.Grass;
+        
+        // Update default color based on resource type
+        switch (type)
+        {
+            case ResourceType.Grass:
+                defaultColor = grassColor;
+                break;
+            case ResourceType.Iron:
+                defaultColor = ironColor;
+                break;
+            case ResourceType.Copper:
+                defaultColor = copperColor;
+                break;
+            case ResourceType.Coal:
+                defaultColor = coalColor;
+                break;
+        }
+        
+        if (!isSelected && !isHighlighted)
+        {
+            UpdateVisual();
+        }
+    }
+    
+    public void ClearResource()
+    {
+        SetResource(ResourceType.Grass, 0f);
+    }
+    
+    public bool CanExtractResource(float amount = 1f)
+    {
+        // For infinite harvesting, always return true if the tile has a resource
+        return hasResource && resourceType != ResourceType.Grass;
+    }
+    
+    public float ExtractResource(float amount = 1f)
+    {
+        if (!CanExtractResource(amount))
+        {
+            return 0f;
+        }
+        
+        // For infinite harvesting, always return the requested amount without reducing the tile's resource
+        // The resource amount stays the same, allowing infinite extraction
+        return amount;
     }
     
     public void ResetVisual()

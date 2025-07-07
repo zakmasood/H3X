@@ -132,6 +132,10 @@ GameObject:
   - component: {fileID: 330585544}
   - component: {fileID: 330585547}
   - component: {fileID: 330585548}
+  - component: {fileID: 330585549}
+  - component: {fileID: 330585551}
+  - component: {fileID: 330585550}
+  - component: {fileID: 330585552}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -269,7 +273,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ed1fb339109403438989ea190852684, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HexGridDemo
-  hexGrid: {fileID: 1201843111}
+  hexGrid: {fileID: 0}
   mainCamera: {fileID: 330585545}
   hexLayerMask:
     serializedVersion: 2
@@ -282,6 +286,97 @@ MonoBehaviour:
   highlightedColor: {r: 0, g: 1, b: 1, a: 1}
   pathColor: {r: 0, g: 1, b: 0, a: 1}
   areaColor: {r: 0, g: 0, b: 1, a: 1}
+--- !u!114 &330585549
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 330585543}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee84c215b8993cd4fbee20193d104a2b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::IsometricCameraController
+  moveSpeed: 10
+  zoomSpeed: 100
+  rotationSpeed: 100
+  smoothTime: 0.1
+  minZoom: 5
+  maxZoom: 20
+  minX: -50
+  maxX: 50
+  minZ: -50
+  maxZ: 50
+  isometricAngle: 45
+  lockRotation: 1
+  controlledCamera: {fileID: 330585545}
+  hexGrid: {fileID: 0}
+--- !u!114 &330585550
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 330585543}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41ffae0fc1c8ee74ebb401ec9621c043, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HexGridGenerator
+  radius: 20
+  hexSize: 1
+  hexHeight: 1
+  hexMaterial: {fileID: 2100000, guid: 3d95cdc794384d84da5a6346873a3b95, type: 2}
+  hexColor: {r: 1, g: 1, b: 1, a: 1}
+  borderColor: {r: 0, g: 0, b: 0, a: 1}
+  borderWidth: 8.66
+  generateResources: 1
+  resourceGenerator: {fileID: 330585552}
+  showCoordinates: 1
+  showGridLines: 1
+  OnGridGenerated:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &330585551
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 330585543}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13b489513c5d6d84c8101bb73ada6b44, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ResourceDemo
+  hexGrid: {fileID: 330585550}
+  resourceGenerator: {fileID: 330585552}
+  regenerateKey: 114
+  toggleResourceInfoKey: 105
+  extractResourceKey: 101
+  highDensityKey: 104
+  lowDensityKey: 108
+--- !u!114 &330585552
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 330585543}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a63a13c6d52c00343986279e40fea9bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ResourceGenerator
+  noiseScale: 30
+  seed: 3939
+  noiseOffset: {x: 0, y: 0}
+  ironThreshold: 0.45
+  copperThreshold: 0.55
+  coalThreshold: 0.59
+  resourceDensity: 0.8
+  showResourceInfo: 1
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -452,59 +547,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1201843109
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1201843110}
-  - component: {fileID: 1201843111}
-  m_Layer: 0
-  m_Name: Main
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1201843110
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1201843109}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: -1, w: 0}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -180}
---- !u!114 &1201843111
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1201843109}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 41ffae0fc1c8ee74ebb401ec9621c043, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HexGridGenerator
-  radius: 3
-  hexSize: 1
-  hexHeight: 1
-  hexMaterial: {fileID: 2100000, guid: 3d95cdc794384d84da5a6346873a3b95, type: 2}
-  hexColor: {r: 1, g: 1, b: 1, a: 1}
-  borderColor: {r: 0, g: 0, b: 0, a: 1}
-  borderWidth: 8.66
-  showCoordinates: 1
-  showGridLines: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -512,4 +554,3 @@ SceneRoots:
   - {fileID: 330585546}
   - {fileID: 410087041}
   - {fileID: 832575519}
-  - {fileID: 1201843110}
