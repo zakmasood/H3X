@@ -6,12 +6,12 @@
 
 * [x] Implement pointy-top **hexagonal grid** with axial coordinates.
 * [x] Support tile selection / highlighting via mouse.
-* [ ] Allow tile data storage (terrain, contents, building ID, etc.).
+* [x] Allow tile data storage (terrain, contents, building ID, etc.).
 
 #### ✅ Camera & Input
 
-* [ ] Basic 3D isometric camera (pan, zoom, rotate optional).
-* [ ] Click-to-select tile/building.
+* [x] Basic 3D isometric camera (pan, zoom, rotate optional).
+* [x] Click-to-select tile/building.
 * [ ] Hotkey or UI-based build mode toggling.
 
 ---
