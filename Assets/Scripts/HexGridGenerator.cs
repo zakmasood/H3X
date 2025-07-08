@@ -9,6 +9,12 @@ public class HexGridGenerator : MonoBehaviour
     [SerializeField] private float hexSize = 1f;
     [SerializeField] private float hexHeight = 0.1f;
     
+    [Header("Hex Tile Prefab")]
+    [SerializeField] private GameObject hexTilePrefab;
+    
+    [Header("Container")]
+    [SerializeField] private Transform hexContainer;
+    
     [Header("Visual Settings")]
     [SerializeField] private Material hexMaterial;
     [SerializeField] private Color hexColor = Color.white;
@@ -37,6 +43,14 @@ public class HexGridGenerator : MonoBehaviour
     
     private void Start()
     {
+        // Create hex container if not assigned
+        if (hexContainer == null)
+        {
+            GameObject container = new GameObject("HexContainer");
+            hexContainer = container.transform;
+            hexContainer.SetParent(transform);
+        }
+        
         GenerateHexGrid();
     }
     
@@ -87,40 +101,56 @@ public class HexGridGenerator : MonoBehaviour
     
     private void CreateHexTile(Vector3Int cubeCoord)
     {
-        GameObject hexTile = new GameObject($"Hex_{cubeCoord.x}_{cubeCoord.y}_{cubeCoord.z}");
-        hexTile.transform.SetParent(transform);
+        GameObject hexTile;
         
-        // Add mesh components
-        MeshFilter meshFilter = hexTile.AddComponent<MeshFilter>();
-        MeshRenderer meshRenderer = hexTile.AddComponent<MeshRenderer>();
-        MeshCollider meshCollider = hexTile.AddComponent<MeshCollider>();
-        
-        // Create hex mesh
-        Mesh hexMesh = CreateHexMesh();
-        meshFilter.mesh = hexMesh;
-        meshCollider.sharedMesh = hexMesh;
-        
-        // Set material
-        if (hexMaterial != null)
+        // Use prefab if assigned, otherwise fallback to mesh generation
+        if (hexTilePrefab != null)
         {
-            meshRenderer.material = hexMaterial;
+            hexTile = Instantiate(hexTilePrefab, hexContainer);
+            hexTile.name = $"Hex_{cubeCoord.x}_{cubeCoord.y}_{cubeCoord.z}";
         }
         else
         {
-            meshRenderer.material = new Material(Shader.Find("Standard"));
-            meshRenderer.material.color = hexColor;
+            // Fallback to dynamic mesh generation
+            hexTile = new GameObject($"Hex_{cubeCoord.x}_{cubeCoord.y}_{cubeCoord.z}");
+            hexTile.transform.SetParent(hexContainer);
+            
+            // Add mesh components
+            MeshFilter meshFilter = hexTile.AddComponent<MeshFilter>();
+            MeshRenderer meshRenderer = hexTile.AddComponent<MeshRenderer>();
+            MeshCollider meshCollider = hexTile.AddComponent<MeshCollider>();
+            
+            // Create hex mesh
+            Mesh hexMesh = CreateHexMesh();
+            meshFilter.mesh = hexMesh;
+            meshCollider.sharedMesh = hexMesh;
+            
+            // Set material
+            if (hexMaterial != null)
+            {
+                meshRenderer.material = hexMaterial;
+            }
+            else
+            {
+                meshRenderer.material = new Material(Shader.Find("Standard"));
+                meshRenderer.material.color = hexColor;
+            }
+            
+            // Configure material for proper lighting
+            meshRenderer.material.SetFloat("_Glossiness", 0.1f);
+            meshRenderer.material.SetFloat("_Metallic", 0.0f);
         }
-        
-        // Configure material for proper lighting
-        meshRenderer.material.SetFloat("_Glossiness", 0.1f); // Low glossiness for flat surface
-        meshRenderer.material.SetFloat("_Metallic", 0.0f); // Non-metallic
         
         // Position the hex
         Vector3 worldPos = CubeToWorldPosition(cubeCoord);
         hexTile.transform.position = worldPos;
         
-        // Add hex data component
-        HexTile hexData = hexTile.AddComponent<HexTile>();
+        // Add hex data component (if not already present)
+        HexTile hexData = hexTile.GetComponent<HexTile>();
+        if (hexData == null)
+        {
+            hexData = hexTile.AddComponent<HexTile>();
+        }
         hexData.Initialize(cubeCoord, worldPos);
         
         hexTiles.Add(hexTile);

@@ -105,10 +105,10 @@ public class IsometricCameraController : MonoBehaviour
         rotationInput = 0f;
         if (Keyboard.current != null)
         {
-            if (Keyboard.current.qKey.isPressed)
-                rotationInput -= 1f;
-            if (Keyboard.current.eKey.isPressed)
-                rotationInput += 1f;
+            if (Keyboard.current.qKey.wasPressedThisFrame)
+                rotationInput -= 60f; // Snap to 60-degree increments for hexagons
+            if (Keyboard.current.eKey.wasPressedThisFrame)
+                rotationInput += 60f; // Snap to 60-degree increments for hexagons
         }
         
         // Mouse rotation (right mouse button)
@@ -117,14 +117,29 @@ public class IsometricCameraController : MonoBehaviour
             Vector2 mouseDelta = Mouse.current.delta.ReadValue();
             rotationInput += mouseDelta.x * 0.1f;
         }
+        
+        // Reset camera to center hexagon
+        if (Keyboard.current != null && Keyboard.current.rKey.wasPressedThisFrame)
+        {
+            ResetCamera();
+        }
     }
     
     private void UpdateCamera()
     {
         // Update target position
         Vector3 moveDirection = new Vector3(moveInput.x, 0, moveInput.y);
-        moveDirection = transform.TransformDirection(moveDirection);
-        targetPosition += moveDirection * moveSpeed * Time.deltaTime;
+        
+        // Convert movement to hexagon-aligned directions
+        if (moveDirection.magnitude > 0.1f)
+        {
+            // Get the current rotation angle in degrees
+            float currentAngle = transform.eulerAngles.y;
+            
+            // Convert to hexagon-aligned movement
+            Vector3 hexAlignedDirection = GetHexAlignedDirection(moveDirection, currentAngle);
+            targetPosition += hexAlignedDirection * moveSpeed * Time.deltaTime;
+        }
         
         // Clamp position to limits
         targetPosition.x = Mathf.Clamp(targetPosition.x, minX, maxX);
@@ -152,7 +167,12 @@ public class IsometricCameraController : MonoBehaviour
         // Update target rotation
         if (!lockRotation)
         {
-            targetRotation += rotationInput * rotationSpeed * Time.deltaTime;
+            if (rotationInput != 0f)
+            {
+                // Snap to 60-degree increments for hexagon alignment
+                targetRotation += rotationInput;
+                targetRotation = Mathf.Round(targetRotation / 60f) * 60f;
+            }
             
             // Smooth rotation
             Vector3 currentRotation = transform.eulerAngles;
@@ -212,8 +232,16 @@ public class IsometricCameraController : MonoBehaviour
     {
         if (hexGrid != null)
         {
-            FocusOnGrid(hexGrid);
+            // Focus on the center hexagon (0,0,0)
+            Vector3 centerHexPosition = hexGrid.CubeToWorldPosition(Vector3Int.zero);
+            targetPosition = centerHexPosition + new Vector3(0, 15f, -15f);
         }
+        else
+        {
+            // Fallback to grid center if no hex grid
+            targetPosition = Vector3.zero + new Vector3(0, 15f, -15f);
+        }
+        
         SetZoom(10f);
         SetRotation(0f);
     }
@@ -222,6 +250,39 @@ public class IsometricCameraController : MonoBehaviour
     public Vector3 CameraPosition => transform.position;
     public float CameraZoom => controlledCamera.orthographic ? controlledCamera.orthographicSize : controlledCamera.fieldOfView;
     public float CameraRotation => transform.eulerAngles.y;
+    
+    // Convert movement input to hexagon-aligned directions
+    private Vector3 GetHexAlignedDirection(Vector3 input, float currentAngle)
+    {
+        // Hexagon directions (flat-topped hexagons)
+        Vector3[] hexDirections = {
+            new Vector3(1, 0, 0),      // Right
+            new Vector3(0.5f, 0, 0.866f),  // Top-Right
+            new Vector3(-0.5f, 0, 0.866f), // Top-Left
+            new Vector3(-1, 0, 0),     // Left
+            new Vector3(-0.5f, 0, -0.866f), // Bottom-Left
+            new Vector3(0.5f, 0, -0.866f)   // Bottom-Right
+        };
+        
+        // Find the closest hex direction based on input
+        Vector3 normalizedInput = input.normalized;
+        float bestDot = -1f;
+        Vector3 bestDirection = Vector3.zero;
+        
+        for (int i = 0; i < hexDirections.Length; i++)
+        {
+            float dot = Vector3.Dot(normalizedInput, hexDirections[i]);
+            if (dot > bestDot)
+            {
+                bestDot = dot;
+                bestDirection = hexDirections[i];
+            }
+        }
+        
+        // Apply current rotation to the hex direction
+        Quaternion rotation = Quaternion.Euler(0, currentAngle, 0);
+        return rotation * bestDirection;
+    }
     
     // Gizmos for debugging movement limits
     private void OnDrawGizmosSelected()
