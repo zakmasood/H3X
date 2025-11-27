@@ -4,7 +4,7 @@ A Unity game development project built with Unity 6.
 
 ## Project Overview
 
-H3X is a game being developed by Manoversa. The project is built using Unity's Universal Render Pipeline (URP) and the new Input System.
+H3X is a game project being developed by Manoversa. The project is built using Unity's Universal Render Pipeline (URP) and the new Input System, with support for multiple input devices including keyboard/mouse, gamepad, and touch controls.
 
 ## Technology Stack
 
@@ -267,14 +267,16 @@ public class ExampleTests
 
 ## Key Packages
 
-| Package | Version | Purpose |
-|---------|---------|---------|
-| Universal RP | 17.2.0 | Render pipeline |
-| Input System | 1.14.2 | New input handling |
-| AI Navigation | 2.0.9 | NavMesh pathfinding |
-| Timeline | 1.8.9 | Cinematic sequencing |
-| Visual Scripting | 1.9.8 | Node-based logic |
-| Test Framework | 1.6.0 | Unit testing |
+The following packages are used in this project. For current versions, refer to `Packages/manifest.json`.
+
+| Package | Purpose |
+|---------|---------|
+| Universal RP | Render pipeline |
+| Input System | New input handling |
+| AI Navigation | NavMesh pathfinding |
+| Timeline | Cinematic sequencing |
+| Visual Scripting | Node-based logic |
+| Test Framework | Unit testing |
 
 ## Troubleshooting
 
