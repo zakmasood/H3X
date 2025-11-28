@@ -40,6 +40,8 @@ H3X is a game project being developed by Manoversa. The project is built using U
 
 ## Project Structure
 
+> **Note:** This project structure is temporary and subject to change over the lifespan of the project.
+
 ```
 H3X/
 ├── Assets/
